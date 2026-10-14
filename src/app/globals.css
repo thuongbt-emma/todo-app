@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f7f8; --surface: #ffffff; --surface-2: #f0f0f3;
+  --text: #1c1c1f; --muted: #6f6f78; --border: #e3e3e8;
+  --danger: #e5484d; --warn: #d97706; --accent: #f05a22;
+  --gap: 8px; --pad: 10px;
+}
+[data-theme="dark"] {
+  --bg: #111113; --surface: #1b1b1f; --surface-2: #232328;
+  --text: #ededef; --muted: #9b9ba4; --border: #2e2e35; --warn: #f5a623;
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --bg: #111113; --surface: #1b1b1f; --surface-2: #232328;
+    --text: #ededef; --muted: #9b9ba4; --border: #2e2e35; --warn: #f5a623;
+  }
+}
+[data-density="compact"] { --gap: 4px; --pad: 6px; font-size: 14px; }
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+}
+
+body { background: var(--bg); color: var(--text); }
+input[type="checkbox"] { accent-color: var(--accent); }

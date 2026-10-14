@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String
+  color     String
+  order     Float
+  createdAt DateTime @default(now())
+  cards     Card[]
+}
+
+model Card {
+  id          String    @id @default(cuid())
+  title       String
+  note        String    @default("")
+  groupId     String
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Restrict)
+  order       Float
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+  deletedAt   DateTime?
+  steps       Step[]
+  tags        CardTag[]
+
+  @@index([groupId, order])
+  @@index([completedAt])
+}
+
+model Step {
+  id        String    @id @default(cuid())
+  cardId    String
+  card      Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  text      String
+  dueDate   DateTime? @db.Date
+  personId  String?
+  person    Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+  order     Float
+  createdAt DateTime  @default(now())
+  doneAt    DateTime?
+  deletedAt DateTime?
+
+  @@index([cardId, order])
+  @@index([doneAt])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  color String
+  cards CardTag[]
+  notes NoteTag[]
+}
+
+model CardTag {
+  cardId String
+  tagId  String
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, tagId])
+}
+
+model Person {
+  id    String @id @default(cuid())
+  name  String @unique
+  color String
+  steps Step[]
+}
+
+model Settings {
+  id          Int    @id @default(1)
+  theme       String @default("system")  // light | dark | system
+  accent      String @default("#f05a22")
+  density     String @default("cozy")    // compact | cozy
+  defaultView String @default("board")   // board | list | agenda
+  showDone    Boolean @default(true)  // show done steps on Board/List cards
+}
+
+model Note {
+  id        String    @id @default(cuid())
+  title     String    @default("")
+  body      String    @default("")
+  pinned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  tags      NoteTag[]
+
+  @@index([deletedAt, pinned, updatedAt])
+}
+
+model NoteTag {
+  noteId String
+  tagId  String
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+}
